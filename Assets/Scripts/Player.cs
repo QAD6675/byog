@@ -11,11 +11,13 @@ public class Player : MonoBehaviour
     [SerializeField]GameObject panel;
     private Transform transform;
     private bool hasDbjump = false;
-    private bool touchingWall = false;
     private float horizontal;
     private bool dashing = false;
     private bool isFacingRight = true;
     [SerializeField]private float speed = 8f;
+    [SerializeField] private float coyoteTime = 0.9f; // Adjust as needed
+    private float coyoteTimeCounter; 
+    
     [SerializeField]private float jumpingPower = 12f;
     [SerializeField]private float dashPower = 10f;
     private bool onGround = false;
@@ -39,7 +41,7 @@ public class Player : MonoBehaviour
     void Update()
     {
     if (dashing)return;//disable input while dashing
-
+    coyoteTimeCounter = onGround?coyoteTime:coyoteTimeCounter - Time.deltaTime;
     horizontal = Input.GetAxisRaw("Horizontal");
     animator.SetBool("walking",horizontal!=0&&onGround);
 
@@ -81,9 +83,6 @@ public class Player : MonoBehaviour
                 animator.SetBool("jumping",false);
                 if (abilities[3]) hasDbjump = true;//recharge dbjump
                 break;
-            case "wall":
-                touchingWall = true;
-                break;
             case "hazard"://all things that hurt
                 die();
                 break;
@@ -115,12 +114,14 @@ public class Player : MonoBehaviour
                 break;
         }
     }
-    private void OnCollisionExit2D(Collision2D other) {
-        touchingWall = false;
-    }
+
     private void FixedUpdate() {
-        if (touchingWall||(!isFacingRight&&!abilities[0]))return;//don't go left if you didn't unlock that
+        if (!isFacingRight&&!abilities[0])return;//don't go left if you didn't unlock that
+        // Only allow horizontal movement if on the ground or within coyote time
+    if (onGround || coyoteTimeCounter > 0)
+    {
         rb.velocity = new(horizontal * speed, rb.velocity.y);
+    }
     }
     private void die(){
         if (dashing) return;
