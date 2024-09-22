@@ -16,6 +16,7 @@ public class panelScript : MonoBehaviour {
     public void PlayGame()
     {
         Time.timeScale=1;
+        gameObject.SetActive(false);
     }
     public void lockCreds(){
         credsButton.enabled=false;
