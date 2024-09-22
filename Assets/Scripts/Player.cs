@@ -2,13 +2,14 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using UnityEngine.SceneManagement;
 public class Player : MonoBehaviour
 {
     Rigidbody2D rb;
     Animator animator;
     [SerializeField]Vector3 startingPosition;
     [SerializeField]GameObject panel;
+    private bool hasKey = false;
     private Transform transform;
     private bool hasDbjump = false;
     private float horizontal;
@@ -89,6 +90,14 @@ public class Player : MonoBehaviour
             case "left":
                 unlock(0);
                 Destroy(other.gameObject);
+                break;
+            case "key":
+                hasKey = true;
+                Destroy(other.gameObject);
+                break;
+            case "win":
+                if (hasKey)
+                    SceneManager.LoadScene("win");
                 break;
             case "jump":
                 unlock(1);
